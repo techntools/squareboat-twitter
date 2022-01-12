@@ -14,7 +14,7 @@ from django.contrib.auth import get_user_model
 def generate_access_token(user):
     access_token_payload = {
         'user_id': user.id,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, minutes=2 * 60),
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1),
         'iat': datetime.datetime.utcnow()
     }
 
