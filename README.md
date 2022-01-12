@@ -26,9 +26,9 @@
 
 - REST API designs should be appropriate.
   
-  - Stateless
+  - Stateless - token based authentication
   
-  - Token based authentication
+  - Uniform interface
   
   - Consistent response format
 
@@ -45,3 +45,5 @@
 - Usage of Docker for development environments.
   
   - Very useful
+
+
