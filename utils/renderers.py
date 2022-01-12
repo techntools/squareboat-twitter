@@ -6,9 +6,13 @@ class ResponseJSONRenderer(JSONRenderer):
         if data is None:
             return
 
-        if data and 'error' in data:
+        if 'error' in data:
             resp = data
             del resp['error']
+        elif isinstance(data, str):
+            resp = {
+                'message': data,
+            }
         else:
             resp = {
                 'data': data,

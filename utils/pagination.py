@@ -2,7 +2,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
 
-class ListPagination(LimitOffsetPagination):
+class LOPagination(LimitOffsetPagination):
     def get_paginated_response(self, data):
         resp = {
             'metadata': {

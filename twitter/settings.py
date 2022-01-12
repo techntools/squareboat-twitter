@@ -153,7 +153,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'utils.auth.UserJWTAuthentication',
     ),
-    'DEFAULT_PAGINATION_CLASS': 'utils.custom_pagination.ListPagination',
+    'DEFAULT_PAGINATION_CLASS': 'utils.pagination.LOPagination',
     'PAGE_SIZE': 10,
 }
 

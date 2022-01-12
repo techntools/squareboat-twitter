@@ -7,11 +7,14 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.generics import (
     RetrieveUpdateDestroyAPIView,
+    CreateAPIView,
+    RetrieveDestroyAPIView,
+    ListAPIView,
     GenericAPIView
 )
 
-from hummers.models import Profile, Followers
-from hummers.serializers import ProfileSerializer
+from hummers.models import Profile, Followers, Tweet
+from hummers.serializers import ProfileSerializer, TweetSerializer
 
 User = get_user_model()
 
@@ -39,6 +42,9 @@ class Follow(GenericAPIView):
         try:
             following_user = User.objects.get(username=self.kwargs['username'])
 
+            if following_user.username == self.request.user.username:
+                raise exceptions.ValidationError('You can not follow yourself')
+
             Followers.objects.create(
                 follower=self.request.user,
                 following=following_user
@@ -46,9 +52,9 @@ class Follow(GenericAPIView):
         except User.DoesNotExist:
             raise exceptions.NotFound('No such hummer to follow')
         except IntegrityError:
-            raise exceptions.NotFound('You are already following this hummer')
+            raise exceptions.ValidationError('You are already following this hummer')
 
-        return Response()
+        return Response('You are now following the hummer')
 
 
 class Unfollow(GenericAPIView):
@@ -58,8 +64,27 @@ class Unfollow(GenericAPIView):
 
             deleted = Followers.objects.filter(following=following_user).delete()
             if deleted[0] == 0:
-                raise exceptions.NotFound('You are not following the hummer')
+                raise exceptions.ValidationError('You are not following the hummer')
         except User.DoesNotExist:
             raise exceptions.NotFound('No such hummer to unfollow')
 
-        return Response()
+        return Response('You are not following this hummer anymore')
+
+
+class Tweeting(CreateAPIView, RetrieveDestroyAPIView):
+    queryset = Tweet.objects.all()
+    serializer_class = TweetSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class TweetFeed(ListAPIView):
+    serializer_class = TweetSerializer
+
+    def get_queryset(self):
+        following = self.request.user.following.values_list(
+            'following__id', flat=True
+        )
+
+        return Tweet.objects.filter(user__id__in=following).distinct().order_by('-created_at')
